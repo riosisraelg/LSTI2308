@@ -1,0 +1,291 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nyt/apasortcite//global/global/global}
+    \entry{analisis}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=10a86a3e2567ae49246371853c3b5e1d}{%
+           family={{Análisis Multimedia}},
+           familyi={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{10a86a3e2567ae49246371853c3b5e1d}
+      \strng{fullhash}{10a86a3e2567ae49246371853c3b5e1d}
+      \strng{fullhashraw}{10a86a3e2567ae49246371853c3b5e1d}
+      \strng{bibnamehash}{10a86a3e2567ae49246371853c3b5e1d}
+      \strng{authorbibnamehash}{10a86a3e2567ae49246371853c3b5e1d}
+      \strng{authornamehash}{10a86a3e2567ae49246371853c3b5e1d}
+      \strng{authorfullhash}{10a86a3e2567ae49246371853c3b5e1d}
+      \strng{authorfullhashraw}{10a86a3e2567ae49246371853c3b5e1d}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{labeldatesource}{nodate}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Segmentación de Memoria y Ciclos de CPU}
+      \field{urlday}{13}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.youtube.com/watch?v=p9yZNLeOj4s
+      \endverb
+      \verb{url}
+      \verb https://www.youtube.com/watch?v=p9yZNLeOj4s
+      \endverb
+    \endentry
+    \entry{grokipage}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=3a9a12d27f95439e483330f737e68be7}{%
+           family={{Grokipedia}},
+           familyi={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{fullhash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{fullhashraw}{3a9a12d27f95439e483330f737e68be7}
+      \strng{bibnamehash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{authorbibnamehash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{authornamehash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{authorfullhash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{authorfullhashraw}{3a9a12d27f95439e483330f737e68be7}
+      \field{extraname}{1}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{extradate}{1}
+      \field{labeldatesource}{nodate}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Memory Paging Mechanisms}
+      \field{urlday}{13}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://grokipedia.com/page/Memory_paging
+      \endverb
+      \verb{url}
+      \verb https://grokipedia.com/page/Memory_paging
+      \endverb
+    \endentry
+    \entry{grokiseg}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=3a9a12d27f95439e483330f737e68be7}{%
+           family={{Grokipedia}},
+           familyi={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{fullhash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{fullhashraw}{3a9a12d27f95439e483330f737e68be7}
+      \strng{bibnamehash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{authorbibnamehash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{authornamehash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{authorfullhash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{authorfullhashraw}{3a9a12d27f95439e483330f737e68be7}
+      \field{extraname}{2}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{extradate}{2}
+      \field{labeldatesource}{nodate}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Memory Segmentation Architecture}
+      \field{urlday}{13}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://grokipedia.com/page/Memory_segmentation
+      \endverb
+      \verb{url}
+      \verb https://grokipedia.com/page/Memory_segmentation
+      \endverb
+    \endentry
+    \entry{ual2026}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=e0b4b5e6cae6a02aac5cf4f1f7687bb3}{%
+           family={{Universidad de Almería}},
+           familyi={U\bibinitperiod}}}%
+      }
+      \strng{namehash}{e0b4b5e6cae6a02aac5cf4f1f7687bb3}
+      \strng{fullhash}{e0b4b5e6cae6a02aac5cf4f1f7687bb3}
+      \strng{fullhashraw}{e0b4b5e6cae6a02aac5cf4f1f7687bb3}
+      \strng{bibnamehash}{e0b4b5e6cae6a02aac5cf4f1f7687bb3}
+      \strng{authorbibnamehash}{e0b4b5e6cae6a02aac5cf4f1f7687bb3}
+      \strng{authornamehash}{e0b4b5e6cae6a02aac5cf4f1f7687bb3}
+      \strng{authorfullhash}{e0b4b5e6cae6a02aac5cf4f1f7687bb3}
+      \strng{authorfullhashraw}{e0b4b5e6cae6a02aac5cf4f1f7687bb3}
+      \field{sortinit}{U}
+      \field{sortinithash}{6901a00e45705986ee5e7ca9fd39adca}
+      \field{labeldatesource}{nodate}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Gestión de Memoria en Sistemas Operativos}
+      \field{urlday}{13}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://w3.ual.es/~rguirado/so/tema5.pdf
+      \endverb
+      \verb{url}
+      \verb https://w3.ual.es/~rguirado/so/tema5.pdf
+      \endverb
+    \endentry
+  \enddatalist
+  \datalist[entry]{nyt/global//global/global/global}
+    \entry{analisis}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=10a86a3e2567ae49246371853c3b5e1d}{%
+           family={{Análisis Multimedia}},
+           familyi={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{10a86a3e2567ae49246371853c3b5e1d}
+      \strng{fullhash}{10a86a3e2567ae49246371853c3b5e1d}
+      \strng{fullhashraw}{10a86a3e2567ae49246371853c3b5e1d}
+      \strng{bibnamehash}{10a86a3e2567ae49246371853c3b5e1d}
+      \strng{authorbibnamehash}{10a86a3e2567ae49246371853c3b5e1d}
+      \strng{authornamehash}{10a86a3e2567ae49246371853c3b5e1d}
+      \strng{authorfullhash}{10a86a3e2567ae49246371853c3b5e1d}
+      \strng{authorfullhashraw}{10a86a3e2567ae49246371853c3b5e1d}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{labeldatesource}{nodate}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Segmentación de Memoria y Ciclos de CPU}
+      \field{urlday}{13}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.youtube.com/watch?v=p9yZNLeOj4s
+      \endverb
+      \verb{url}
+      \verb https://www.youtube.com/watch?v=p9yZNLeOj4s
+      \endverb
+    \endentry
+    \entry{grokipage}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=3a9a12d27f95439e483330f737e68be7}{%
+           family={{Grokipedia}},
+           familyi={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{fullhash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{fullhashraw}{3a9a12d27f95439e483330f737e68be7}
+      \strng{bibnamehash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{authorbibnamehash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{authornamehash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{authorfullhash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{authorfullhashraw}{3a9a12d27f95439e483330f737e68be7}
+      \field{extraname}{1}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{extradate}{1}
+      \field{labeldatesource}{nodate}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Memory Paging Mechanisms}
+      \field{urlday}{13}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://grokipedia.com/page/Memory_paging
+      \endverb
+      \verb{url}
+      \verb https://grokipedia.com/page/Memory_paging
+      \endverb
+    \endentry
+    \entry{grokiseg}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=3a9a12d27f95439e483330f737e68be7}{%
+           family={{Grokipedia}},
+           familyi={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{fullhash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{fullhashraw}{3a9a12d27f95439e483330f737e68be7}
+      \strng{bibnamehash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{authorbibnamehash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{authornamehash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{authorfullhash}{3a9a12d27f95439e483330f737e68be7}
+      \strng{authorfullhashraw}{3a9a12d27f95439e483330f737e68be7}
+      \field{extraname}{2}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{extradate}{2}
+      \field{labeldatesource}{nodate}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Memory Segmentation Architecture}
+      \field{urlday}{13}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://grokipedia.com/page/Memory_segmentation
+      \endverb
+      \verb{url}
+      \verb https://grokipedia.com/page/Memory_segmentation
+      \endverb
+    \endentry
+    \entry{ual2026}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=e0b4b5e6cae6a02aac5cf4f1f7687bb3}{%
+           family={{Universidad de Almería}},
+           familyi={U\bibinitperiod}}}%
+      }
+      \strng{namehash}{e0b4b5e6cae6a02aac5cf4f1f7687bb3}
+      \strng{fullhash}{e0b4b5e6cae6a02aac5cf4f1f7687bb3}
+      \strng{fullhashraw}{e0b4b5e6cae6a02aac5cf4f1f7687bb3}
+      \strng{bibnamehash}{e0b4b5e6cae6a02aac5cf4f1f7687bb3}
+      \strng{authorbibnamehash}{e0b4b5e6cae6a02aac5cf4f1f7687bb3}
+      \strng{authornamehash}{e0b4b5e6cae6a02aac5cf4f1f7687bb3}
+      \strng{authorfullhash}{e0b4b5e6cae6a02aac5cf4f1f7687bb3}
+      \strng{authorfullhashraw}{e0b4b5e6cae6a02aac5cf4f1f7687bb3}
+      \field{sortinit}{U}
+      \field{sortinithash}{6901a00e45705986ee5e7ca9fd39adca}
+      \field{labeldatesource}{nodate}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Gestión de Memoria en Sistemas Operativos}
+      \field{urlday}{13}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://w3.ual.es/~rguirado/so/tema5.pdf
+      \endverb
+      \verb{url}
+      \verb https://w3.ual.es/~rguirado/so/tema5.pdf
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

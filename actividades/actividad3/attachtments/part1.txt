@@ -1,0 +1,51 @@
+Propuesta Técnica: Implementación de Segmentación en el Núcleo del Sistema Operativo
+Arquitectura de Sistemas Operativos
+[Fecha actual]
+
+1. Introducción
+Esta propuesta define el mecanismo de gestión de memoria principal para un sistema operativo diseñado para entornos de alta eficiencia. Se selecciona la segmentación como esquema fundamental, permitiendo que el sistema gestione la memoria basándose en la visión lógica del programador y la estructura natural de los procesos.
+
+2. Modelo de Gestión de Memoria
+A diferencia de sistemas operativos robustos y complejos (monolíticos tradicionales), este núcleo se orienta a la eficiencia mediante tareas particulares y una estructura simplificada.
+
+Eficiencia de Segmentos: El sistema es veloz en el uso de memoria debido a una segmentación correcta de los programas. El cargador del SO respeta la división lógica (código, datos, pila) establecida durante la compilación.
+
+Estrategia de Asignación: Se requiere un análisis previo del espacio necesario para cada segmento. El núcleo utiliza esta información para minimizar el desperdicio y optimizar el tiempo de respuesta del gestor de memoria.
+
+3. Análisis de Etapas Operativas
+
+3.1. Etapa 1: Planificación de la Tabla de Segmentos
+El sistema operativo establece una Tabla de Segmentos para cada proceso. El análisis previo permite definir la base y el límite de cada entrada, asegurando que la protección de memoria sea estricta y el aprovechamiento del espacio sea máximo.
+
+3.2. Etapa 2: Traducción y Ejecución
+Durante la ejecución de procesos, la unidad de gestión de memoria utiliza la segmentación para acceder a instrucciones de forma inmediata. Al ser un sistema diseñado para tareas particulares, se evitan las latencias de estructuras de paginación multinivel, favoreciendo la velocidad bruta.
+
+3.3. Etapa 3: Control de Restricciones y Excepciones
+Dada la naturaleza de la segmentación en un entorno de memoria limitada:
+
+Fragmentación Externa: El núcleo gestiona la fragmentación externa derivada de la asignación de bloques de tamaño variable.
+
+Gestión de Violación de Límites: Cuando un cálculo de dirección lógica excede el límite definido en la partición del segmento, el hardware genera una excepción de segmentación (Segmentation Fault).
+
+4. Protocolo de Recuperación del Sistema
+Ante el fallo de un proceso por exceso de límite de segmento, el núcleo ejecuta el siguiente protocolo de recuperación:
+
+Interrupción del proceso mediante excepción de protección.
+
+Liberación de los marcos de memoria comprometidos.
+
+Recarga de los segmentos en la memoria principal (reubicación si es necesario).
+
+Reinicio de la ejecución del proceso para restaurar el servicio.
+
+5. Referencias Bibliográficas
+
+Universidad de Almería. Gestión de Memoria en Sistemas Operativos.
+
+Grokipedia. Memory Paging Mechanisms.
+
+Grokipedia. Memory Segmentation Architecture.
+
+Análisis Multimedia. Segmentación de Memoria y Ciclos de CPU.
+
+https://w3.ual.es/~rguirado/so/tema5.pdfhttps://www.youtube.com/watch?v=p9yZNLeOj4shttps://grokipedia.com/page/Memory_segmentationhttps://grokipedia.com/page/Memory_paging
