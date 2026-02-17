@@ -1,24 +1,29 @@
-\documentclass[stu, 12pt, letterpaper, donotrepeattitle, floatsintext, spanish]{apa7}
-
-% Paquetes básicos
+\documentclass[stu, 12pt, letterpaper, donotrepeattitle, floatsintext, noapacite]{apa7}
 \usepackage[utf8]{inputenc}
 \usepackage[spanish, es-nodecimaldot, es-tabla]{babel}
 \usepackage{csquotes}
 \usepackage{hyperref}
 \usepackage{graphicx}
 
-% Configuración de bibliografía (opcional, pero recomendada para APA 7)
-\usepackage[style=apa, backend=biber]{biblatex}
-% \addbibresource{referencias.bib} % Descomentar si tienes un archivo .bib
+% Configuración de bibliografía usando biblatex-apa (como en Actividad 3)
+\usepackage[style=apa, sortcites=true, sorting=nyt, backend=biber]{biblatex}
 
-% Información de la Portada (Basada en Actividad 3)
+% Creación de archivo de referencias de ejemplo (opcional, puedes borrarlo si usas uno externo)
+\begin{filecontents}[overwrite]{referencias.bib}
+@online{instrucciones4,
+  author={{Universidad Tecmilenio}},
+  title={Actividad 4: Redes de Datos, Seguridad y Sistemas Distribuidos},
+  url={https://utm-cdn-labcontenidos-htfaarehf2gcfycs.a01.azurefd.net/contenido/profesional/lsti2308/entregables-v1/actividad-04.html?version=1},
+  urldate={2026-02-17}
+}
+\end{filecontents}
+\addbibresource{referencias.bib}
+
+% Información del documento (Traído de Actividad 3)
 \title{Actividad 4}
-\shorttitle{Actividad 4} % Título corto para el encabezado
-
-\author{Fernando Israel Rios Garcia \\ AL02877016@tecmilenio.mx \and 
-        Artur Mikhail Lazurenko Mannanov \\ AL03028732@tecmilenio.mx \and 
-        Angel Cuevas Lopez \\ AL03033114@tecmilenio.mx}
-
+\author{Fernando Israel Rios Garcia-AL02877016@tecmilenio.mx \\
+Artur Mikhail Lazurenko Mannanov-AL03028732@tecmilenio.mx \\
+Angel Cuevas Lopez-AL03033114@tecmilenio.mx}
 \affiliation{Universidad Tecmilenio}
 \course{LSTI2308: Sistemas Operativos}
 \professor{Ana Cruz}
@@ -26,22 +31,33 @@
 
 \begin{document}
 
-% Generación automática de la portada APA 7 para estudiantes
+% 1. Portada (Se genera automáticamente con \maketitle en apa7 modo stu)
 \maketitle
 
-% Tabla de contenidos (opcional en APA 7, pero común en reportes académicos)
-\pagenumbering{roman}
+% 2. Tabla de Contenidos y Lista de Figuras (Secciones solicitadas de Actividad 3)
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
 \tableofcontents
+\listoffigures
 \newpage
-\pagenumbering{arabic}
 
+% 3. Cuerpo del Documento
 \section{Introducción}
-Escribe aquí la introducción de tu reporte...
+Este documento presenta el desarrollo de la Actividad 4, donde se aborda el diseño y configuración de una red de datos segura, la aplicación de medidas de seguridad informática y la exploración de sistemas operativos distribuidos y arquitecturas P2P.
 
 \section{Desarrollo}
-Escribe aquí el contenido principal de la actividad 4...
+Contenido principal de la actividad...
 
-% Referencias
-% \printbibliography
+\begin{figure}[h]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{nombre_de_tu_imagen.png}
+    \caption{Ejemplo de figura para la lista de figuras}
+    \label{fig:ejemplo}
+\end{figure}
+
+\newpage
+
+% 4. Referencias (Sección solicitada de Actividad 3)
+\printbibliography[title={Referencias}]
 
 \end{document}
