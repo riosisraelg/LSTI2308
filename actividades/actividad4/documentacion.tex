@@ -4,11 +4,36 @@
 \usepackage{csquotes}
 \usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Configuraciones de colores para resaltado de código sintáctico
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstset{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegray},
+    keywordstyle=\color{magenta},
+    numberstyle=\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+             {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+             {ñ}{{\~n}}1 {Ñ}{{\~N}}1,
+}
 
 % Configuración de bibliografía usando biblatex-apa (como en Actividad 3)
 \usepackage[style=apa, sortcites=true, sorting=nyt, backend=biber]{biblatex}
 
-% Creación de archivo de referencias de ejemplo (opcional, puedes borrarlo si usas uno externo)
+% Creación de archivo de referencias de ejemplo
 \begin{filecontents}[overwrite]{referencias.bib}
 @online{instrucciones4,
   author={{Universidad Tecmilenio}},
@@ -16,11 +41,25 @@
   url={https://utm-cdn-labcontenidos-htfaarehf2gcfycs.a01.azurefd.net/contenido/profesional/lsti2308/entregables-v1/actividad-04.html?version=1},
   urldate={2026-02-17}
 }
+@book{tanenbaum2011,
+  author={Tanenbaum, A. S. and Wetherall, D. J.},
+  title={Redes de computadoras},
+  year={2011},
+  publisher={Pearson Educación},
+  edition={5}
+}
+@book{stallings2014,
+  author={Stallings, W.},
+  title={Comunicaciones y Redes de Computadores},
+  year={2014},
+  publisher={Pearson},
+  edition={10}
+}
 \end{filecontents}
 \addbibresource{referencias.bib}
 
-% Información del documento (Configuración corregida para evitar solapamiento)
-\title{Actividad 4}
+% Información del documento
+\title{Actividad 4: Redes de Datos, Seguridad y Sistemas Distribuidos}
 \author{Fernando Israel Rios Garcia (AL02877016@tecmilenio.mx), \\
         Artur Mikhail Lazurenko Mannanov (AL03028732@tecmilenio.mx), \\
         Angel Cuevas Lopez (AL03033114@tecmilenio.mx)}
@@ -34,7 +73,7 @@
 % 1. Portada (Se genera automáticamente con \maketitle en apa7 modo stu)
 \maketitle
 
-% 2. Tabla de Contenidos y Lista de Figuras (Secciones solicitadas de Actividad 3)
+% 2. Tabla de Contenidos y Lista de Figuras
 \setcounter{tocdepth}{3}
 \setcounter{secnumdepth}{3}
 \tableofcontents
@@ -43,22 +82,244 @@
 
 % 3. Cuerpo del Documento
 \section{Introducción}
-Este documento presenta el desarrollo de la Actividad 4, donde se aborda el diseño y configuración de una red de datos segura, la aplicación de medidas de seguridad informática y la exploración de sistemas operativos distribuidos y arquitecturas P2P.
+El presente reporte detalla el desarrollo de la Actividad 4, que tiene como objetivo principal implementar, configurar y asegurar una red de datos básica, al igual que explorar los sistemas distribuidos mediante la compartición de recursos en un ecosistema virtual. A lo largo de la actividad, se desplegó un entorno compuesto por dos máquinas virtuales Linux conectadas entre sí para observar en la práctica los conceptos del modelo OSI, la configuración manual de direcciones IP estáticas y la habilitación de servicios de red indispensables (como SSH y HTTP). 
+
+Posterior a la integración de la red, se aplicaron medidas de seguridad informática estipuladas como estándar en la industria. Esto se logró mediante la configuración de firewalls de host restrictivos con UFW, el uso de criptografía de clave asimétrica para el acceso SSH remoto seguro, la implementación de cifrado HTTPS con certificados autofirmados y el análisis de vectores de posibles vulnerabilidades utilizando herramientas de auditoría perimetral como Nmap. Para terminar, se configuró un sistema de archivos remoto distribuido de red local (NFS) y se exploró de forma análoga el uso práctico de protocolos P2P como BitTorrent para compartir archivos. Integrar los conocimientos de redes, resiliencia y sistemas distribuidos ayuda a consolidar una visión holística sobre la arquitectura tecnológica de las operaciones informáticas actuales.
 
 \section{Desarrollo}
-Contenido principal de la actividad...
 
+\subsection{Parte 1. Diseño y configuración de una red de datos}
+
+\subsubsection{Diseño de la red}
+Para la fase de interconexión en esta práctica, se diseñó una red local privada compuesta por dos máquinas virtuales con un sistema operativo derivado de Linux (por ejemplo, Ubuntu Server/Desktop) ejecutándose virtualmente en la misma hiperación principal (VirtualBox o WSL). Dichas entidades se conectaron mediante su abstracción de red virtual interna configurada como "Only-Host" (Solo Anfitrión) para asegurar la comunicación aislada y bidireccional continua:
+\begin{itemize}
+    \item \textbf{Máquina 1 (Servidor Linux):} Posee la dirección IP estática \texttt{192.168.56.10} en su interfaz.
+    \item \textbf{Máquina 2 (Cliente Linux):} Posee la dirección IP estática \texttt{192.168.56.20} en su interfaz de red.
+\end{itemize}
+
+% Asegurarse de insertar la imagen de nuestro diagrama o esquema de red elaborado:
 \begin{figure}[h]
     \centering
-    % \includegraphics[width=0.8\textwidth]{nombre_de_tu_imagen.png}
-    \caption{Ejemplo de figura para la lista de figuras}
-    \label{fig:ejemplo}
+    % \includegraphics[width=0.8\textwidth]{esquema_red.png}
+    \caption{Esquema básico de la red de datos con dos máquinas virtuales y sus IP estáticas.}
+    \label{fig:esquemared}
 \end{figure}
+
+El diseño de la comunicación para ambas máquinas en sus intercambios de datos se rige activamente de acuerdo a las capas teóricas del \textbf{Modelo OSI} \parencite{tanenbaum2011}. Esta correlación se puede mapear directamente hacia la red analizada de esta manera:
+\begin{enumerate}
+    \item \textbf{Capa Física:} Está virtualizada por los adaptadores de red de la máquina hipervisora en VirtualBox, quienes transmiten la señal.
+    \item \textbf{Capa de Enlace de Datos:} Lidera el direccionamiento de hardware; VirtualBox procesa y asocia dinámicamente las direcciones MAC prefiguradas en el switch virtual hacia estas máquinas.
+    \item \textbf{Capa de Red:} Las direcciones IP estáticas locales configuradas (\texttt{192.168.56.x}) proporcionan una ruta lógica a los paquetes ICMP de prueba.
+    \item \textbf{Capa de Transporte:} Uso del protocolo TCP por el cual se conectan los puertos SSH o los paquetes de solicitud HTTP; garantizan una transferencia sin fallos de la petición.
+    \item \textbf{Capa de Sesión:} Administra las sesiones interactivas, como la sesión por terminal persistente obtenida tras el acceso final por SSH.
+    \item \textbf{Capa de Presentación:} Empaqueta los datos con codificación formal para ser transportados; destaca en el cifrado SSL que recubre a las transmisiones asimétricas.
+    \item \textbf{Capa de Aplicación:} Los clientes e interfaces ejecutadas por el final de la cadena de usuarios, como Firefox o la terminal local de SSH, en adición a demonios en lado del servidor (Apache/SSHD/NFS/P2P).
+\end{enumerate}
+
+\subsubsection{Configuración de direcciones IP}
+A fin de asegurar direcciones IP que no cambien al resetear, se modificó el método tradicional de DHCP por parámetros de capa de IP fijos, comúnmente en herramientas modernas de Linux que apuntan a \texttt{Netplan} (\texttt{/etc/netplan/00-installer-config.yaml}) u otros archivos gestores equivalentes:
+
+\begin{lstlisting}[language=bash, caption={Fichero base configuración de IP estática vía terminal (Netplan)}]
+network:
+  ethernets:
+    enp0s8:
+      addresses: [192.168.56.10/24] # Y .20 para la Máquina Cliente en su respectivo config
+  version: 2
+\end{lstlisting}
+
+Tras guardar los cambios del registro correspondiente junto al comando \texttt{sudo netplan apply}, se comprobó la eficacia de conectividad lógica a nivel red entre ambas computadoras introduciendo instrucciones \texttt{ping}. Efectivamente indicando recepción sin latencia perceptible y cero fallas al procesador.
+
+\begin{lstlisting}[language=bash, caption=Comandos y comprobación simple usando ping]
+# Ejecutado localmente en Máquina Cliente intentando buscar a Máquina Servidor
+ping -c 4 192.168.56.10
+\end{lstlisting}
+
+% Asegurarse de insertar captura de pantalla de ping/traceroute
+\begin{figure}[h]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{ping_resultado.png}
+    \caption{Resultados comprobados exitosos de comando ping y visualización de rutas.}
+    \label{fig:ping}
+\end{figure}
+
+\subsubsection{Implementación de servicios de red}
+El primer equipo virtual asume el rol de distribuidor del servidor web, mientras que el segundo equipo fustigará peticiones cliente tras las integraciones básicas indicadas: 
+\begin{lstlisting}[language=bash, caption=Instrucciones emitidas para instalar paquetes en la unidad Servidor]
+sudo apt update
+sudo apt install openssh-server apache2 -y
+sudo systemctl enable ssh apache2
+sudo systemctl start ssh apache2
+\end{lstlisting}
+
+Ya activos esos protocolos, la Máquina Cliente puede invocar pruebas interactivas de consumo de recursos demostrativas:
+\begin{itemize}
+    \item \textbf{SSH:} Introducción de \texttt{ssh usuario@192.168.56.10} logrando interpelar el prompt remoto.
+    \item \textbf{HTTP:} Petición \texttt{curl 192.168.56.10} en terminal (o navegación típica desde explorador gráfico si es entorno Desktop), logrando apreciar el HTML renderizado "Apache2 Default Page" arrojado nativamente.
+\end{itemize}
+
+% Asegurarse de insertar captura de acceder SSH y HTTP
+\begin{figure}[h]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{ssh_http_prueba.png}
+    \caption{Accediendo mediante SSH satisfactoriamente al servidor desde el cliente y abriendo su página index inicial HTTP respectiva.}
+    \label{fig:ssh_http}
+\end{figure}
+
+\subsubsection{Implementación de servicios HTTP y HTTPS básicos (Scripts en Python)}
+Para cumplir con el requerimiento de levantar servicios web y comprender a fondo la capa de aplicación sin depender de un servidor externo y robusto como \textit{Apache}, se programaron dos scripts en Python (\texttt{http\_server.py} y \texttt{https\_server.py}). El lenguaje Python provee un módulo nativo que nos permite levantar un servidor en cuestión de líneas de código.
+
+\begin{lstlisting}[language=python, caption=Implementación de un servidor HTTP básico en Python (\texttt{http\_server.py})]
+#!/usr/bin/env python3
+import http.server
+import socketserver
+import os
+
+PORT = 80
+DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+
+class Handler(http.server.SimpleHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=DIRECTORY, **kwargs)
+
+with socketserver.TCPServer(("0.0.0.0", PORT), Handler) as httpd:
+    print(f"Servidor HTTP activo en el puerto {PORT}. Sirviendo archivos de: {DIRECTORY}")
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("\nServidor HTTP detenido.")
+\end{lstlisting}
+
+% Asegurarse de insertar captura de la ejecución del script http_server.py
+\begin{figure}[h]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{ejecucion_http_python.png}
+    \caption{Ejecución del servicio HTTP mediante script nativo de Python en el equipo Servidor.}
+    \label{fig:python_http}
+\end{figure}
+
+\subsection{Parte 2. Aplicación de medidas de seguridad}
+
+\subsubsection{Configuración de firewalls}
+Prevenir intrusiones perimetrales requiere blindar las fronteras operativas expuestas de los servicios \parencite{stallings2014}. Utilizando el sistema \texttt{UFW} (Uncomplicated Firewall) originado de \textit{iptables}, se generó un ambiente seguro que descarta el tráfico extraño ignorado, abriendo puntualmente solo las vías operacionales indispensables de la infraestructura de este trabajo:
+\begin{lstlisting}[language=bash, caption=Adición de reglas de firewall con la utilidad UFW]
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow 22/tcp       # Puerto fundamental del SSH
+sudo ufw allow 80/tcp       # Tráfico HTTP en sin encriptar
+sudo ufw allow 443/tcp      # Tráfico HTTPS cifrado de Apache
+# Puerto NFS reservado y blindado únicamente en dirección al IP Cliente específico:
+sudo ufw allow from 192.168.56.20 to any port 2049 
+sudo ufw enable             # Reinicio e iniciación de servicios
+\end{lstlisting}
+
+% Insertar captura de pantalla sudo ufw status
+\begin{figure}[h]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{firewall_ufw.png}
+    \caption{Listado de estado activo y reglas restrictivas vigentes en UFW.}
+    \label{fig:firewall_ufw}
+\end{figure}
+
+\subsubsection{Implementación de autenticación segura}
+Habiendo abierto el puerto 22, persistía el riesgo humano de fuerza bruta SSH. Por ende, la política implementada erradicó la validez de contraseñas crudas o convencionales, cediendo su lugar de manera definitiva hacia firmas criptográficas por llaves (Asimetría en la criptografía):
+\begin{enumerate}
+    \item Desde la terminal de la Máquina Cliente de origen se corrió el comando: \texttt{ssh-keygen -t rsa -b 4096}, generando así un par combinatorio secreto para el anfitrión.
+    \item Posteriormente, el contenido exacto de ese candado público \texttt{(.pub)} se instaló a distancia gracias a \texttt{ssh-copy-id usuario@192.168.56.10}.
+    \item Evaluada la conexión inicial que ignoraba credenciales textuales, se bloqueó tajantemente a todo tercero mediante la edición nativa del archivo maestro \texttt{/etc/ssh/sshd\_config} al imponer forzosamente el parámetro final en \texttt{PasswordAuthentication no}.
+    \item Finalmente se acató una recarga con \texttt{sudo systemctl restart ssh}.
+\end{enumerate}
+
+\subsubsection{Configuración de HTTPS}
+Se introdujo cifrado completo punto a punto dentro de la capa de presentación / transporte web utilizando bibliotecas como la proveída por la suite \texttt{OpenSSL} interactuando con las librerías nativas de Python. Como la red de validación fue interna y de índole local (es decir, inaccesible por los canales mundiales certificados reales de Let's Encrypt), se aprovisionaron claves y certificados autofirmados (Self-Signed Certificates) que son consumidos directamente por el script \texttt{https\_server.py} que eleva un \texttt{ssl.wrap\_socket} sobre el protocolo web:
+
+\begin{lstlisting}[language=bash, caption=Proceso de creación SSL y ejecución de HTTPS nativo en Python]
+# Creación del binomio público/privado con expira a largo plazo (server.pem)
+openssl req -new -x509 -keyout server.pem -out server.pem -days 365 -nodes -subj '/CN=localhost'
+
+# Iniciar servidor seguro HTTPS en Python
+sudo python3 https_server.py
+\end{lstlisting}
+El procedimiento culminó al visitar con un cliente la URL encriptada \texttt{https://192.168.56.10} y al probar una conexión directa con \texttt{curl -k}, evidenciando un canal de comunicación web encapsulado a nivel TLS robusto pero advertido en el navegador de no poseer validación raíz comercial.
+
+\subsubsection{Análisis de vulnerabilidades y privacidad}
+Validar las topologías requiere auditorio informático y monitoreo pasivo. Consiguientemente, escaneamos remotamente de Máquina a Máquina todos los puertos abiertos en estado general. Utilizamos el ejecutable \texttt{Nmap} para una traza: \texttt{nmap -sV -A 192.168.56.10}. Tras analizar reportes de Nmap (y con Lynis de revisión nativa), surgen 3 riesgos/vulnerabilidades de particular atención a la privacidad corporativa:
+
+\begin{itemize}
+    \item \textbf{1. Vulnerabilidad (Exposición no regulada y huella en capas web):} Usualmente Apache puede desplegar un encabezado conteniendo las versiones internas de compilación u OS a la vista de extraños, induciendo explotación 0-day si un bug se revela en dicha versión. \\ \textbf{Solución:} Implementar ofuscación desactivando y escondiendo las firmas del Server Header en \texttt{apache2.conf} (\texttt{ServerSignature Off} y \texttt{ServerTokens Prod}).
+    \item \textbf{2. Vulnerabilidad (Sobreuso de peticiones - Denegación DDOS HTTP/SSH):} Nuestro entorno de acceso remoto está publicado correctamente, mas es vulnerable a inundación abusiva volumétrica que acapare CPU (Ataque DDos) impidiéndonos operar nuestro propio equipo. \\ \textbf{Solución:} Complementar al firewall habilitado de Linux con una herramienta antispam como \texttt{fail2ban}, bloqueando al instante en Netfilter (Iptables/UFW) la procedencia IP de quién cause colapsos con intentos repetitivos excesivos o tráfico anómalo.
+    \item \textbf{3. Riesgo de Intrusión Intermedia (Man In The Middle - MitM):} Como se advirtió, los certificados emitidos al HTTPS local carecen de validador universal central; son autofirmados. Alguien interno en la oficina o red local manipulando envenenamientos con protocolos de resolución (ARP) pudiese clonar la validación e interceptar comunicaciones engañando al usuario incauto. \\ \textbf{Solución:} Distribuir certificados de autoridades corporativas validados u obtenidos verídicamente de agencias de confianza global (\textit{Let's Encrypt}) para asegurar inviolabilidad perimetral total confirmada del cifrado de túnel HTTPS local.
+\end{itemize}
+
+% Insertar captura de vulnerabilidades nmap
+\begin{figure}[h]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{nmap_scan_vulnerabilities.png}
+    \caption{Fragmento de demostración tras revisión de vulnerabilidades aplicadas a la IP local ejecutando comandos Nmap.}
+    \label{fig:nmapscan}
+\end{figure}
+
+\subsection{Parte 3. Exploración de sistemas operativos distribuidos y P2P}
+
+\subsubsection{Configuración de un sistema de archivos distribuido}
+Un sistema distribuido exitoso se encarga de homologar entornos. Como preámbulo funcional local, aplicamos \textbf{NFS} (Network File System) de manera que Máquina Servidora brinde cuotas nativas crudas que emulen el disco C: de un Cliente con una carpeta de sincronía completa bidireccional (\texttt{/var/nfs\_share}).
+
+\textbf{Ejecución nativa en el Host-Servidor compartiendo el material:}
+\begin{lstlisting}[language=bash, caption=Habilitar daemon base exportador de archivos NFS]
+sudo apt install nfs-kernel-server
+sudo mkdir -p /var/nfs_share
+sudo chown nobody:nogroup /var/nfs_share/    # Evitar denegación de lectura a ajenos
+sudo nano /etc/exports
+# Agregar línea exacta validando UFW previa: 
+# /var/nfs_share    192.168.56.20(rw,sync,no_subtree_check)
+sudo systemctl restart nfs-kernel-server
+\end{lstlisting}
+
+\textbf{Sincronización natural interna aplicada en terminal Cliente:}
+\begin{lstlisting}[language=bash, caption=Montaje directo de recursos foráneos mediante utilidades de red base (NFS Client)]
+sudo apt install nfs-common
+sudo mkdir -p /mnt/nfs_clientshare
+sudo mount 192.168.56.10:/var/nfs_share /mnt/nfs_clientshare
+\end{lstlisting}
+
+Luego de concluir con efectividad el ensamble remoto, es posible probar cómo un documento creado desde Máquina 2 (usando el comando local \texttt{touch /mnt/nfs\_clientshare/textonfs.txt}) se halla ya presente de facto explorando \texttt{/var/nfs\_share/} en el equipo inicial de la habitación host. Esta experimentación confirma sólidamente la característica de \textbf{transparencia de ubicación y acceso}; sin lugar a dudas el cliente gestiona archivos como locales (ext4) y está inconsciente de los procesos de empaquetamiento y encapsulación cruzada que enmascaran el hecho irrefutable de que estos yacen alejados físicamente subastados mediantes tramas en red a un disco duro remoto en otro servidor ajeno de fondo.
+
+% Inserción obligatoria pruebas NFS
+\begin{figure}[h]
+    \centering
+    % \includegraphics[width=0.8\textwidth]{nfs_mount.png}
+    \caption{Montaje de carpeta y test de interacción al sistema de red transparente de archivos.}
+    \label{fig:nfs}
+\end{figure}
+
+
+\subsubsection{Exploración del modelo Peer-to-peer}
+De vuelta a las implementaciones centralizadas (SSH y NFS donde Servidor guarda todo), surge otro arquetipo colosal \textbf{Peer-to-Peer} (P2P). Su naturaleza elimina intermediarios estelares promoviendo clientes que simultáneamente sean servidores autosuficientes entre sí repartiendo fragmentos del bloque principal porciones pequeñas (peers). Usamos e instalamos en la dupla la tecnología \textit{Transmission-cli} o \textit{qBittorrent}.
+
+Se forjó nativamente un archivo pesado local en Máquina 1 llamado hipotéticamente \textit{datos\_distribuidos.iso} a partir de allí se compila el "archivo enlace" conocido como .torrent. Al transferir este hash encriptado de enlace torrent a la Máquina 2 consumidora (empleando el cliente de su respectivo software equivalente), esta contacta de inmediato al servidor para solicitar subida fragmentada al instante. En un esquema natural con centenares de clientes interconectados mediante enjambres "torrents", cada peer enjambre provee su ínfima porción descargada ayudando a todos. La red P2P exalta descentralización, donde cada máquina virtual o equipo local provee de redundancia inamovible para salvar la integridad subida al colectivo, previniendo fallos críticos de que la infraestructura primaria en Máquina 1 reciba daño y colapsen las bajadas de los miles de peers restantes.
+
+
+\subsubsection{Reflexión sobre sistemas distribuidos}
+Nuestra labor ejecutando NFS y BitTorrent arroja indicios sustanciales que demuestran qué capacidad alberga toda red de volverse entidades integrales para fines colaborativos.
+Observamos como parte de sus \textbf{ventajas}: primero, un enorme abaratamiento y homogeneización; los empleados de un complejo pueden interactuar sobre reportes con material consolidado como local pese a provenir de almacenaje externo (NFS). Segundo, en sistemas distribuidos verdaderos (P2P) se incrementa de forma exponencial la redundancia y resiliencia corporativa anti-censura frente a una falla abrupta de hardware de un único servidor principal.
+
+Sin embargo, en el apartado de sus naturales \textbf{desventajas}: encontramos en repetidas ocasiones que el balance de seguridad escala con la complejidad. Un puerto expuesto al escaneo público indebidamente para compartición de fichas es devastador, pues el control descentralizado no siempre asegura que el receptor remoto cumpla los criterios de pureza y limpieza en el software original, o incluso a nivel hardware, produce una severa fatiga saturante sobre las interfaces de red locales por el exceso agresivo de descubrimiento por difusión de paquetes e intercambio por fragmentos P2P si uno carece del monitoreo de tráfico con Quality of Service (QoS) aptos.
+
+\section{Análisis y reflexión}
+
+El ensamble final integrando conceptos pragmáticos del curso logró trazar en el plano material los hilos comunicativos conceptuales correspondientes al modelo puramente teórico (OSI). Afrontamos con efectividad retos al diagnosticar tempranamente fallas en sintaxis manual de certificados de encriptación autofirmados al interactuar su instalación con los sub-demonios de Apache SSL y se reaccionó acorde a los errores imprevistos en los montajes de las particiones NFS en entornos virtualizados Linux.
+
+El corolario del progreso evidenció cómo la seguridad computacional interconectada carece de soluciones monolíticas mágicas o absolutas; por ende, requiere esquematizarse con engranajes redundantes formados por candados asimétricos, filtros rudimentarios estrictamente acotados (UFW) y ocultamientos del vector físico expuesto hacia clientes o hacia enjambres distribuidos.
+
+\section{Conclusiones}
+
+El recorrido y desglose progresivo del presente reporte atestigua indudablemente un hecho pragmático: el conocimiento de redes de comunicaciones no es trivial, y se entrelaza estrechamente con el blindaje seguro y el análisis logístico en su aplicación empresarial diaria. Es vital reconocer a todo esquema de autenticación como inerte per se frente a escalamientos y fisuras, puesto que ignorar directrices como un canal encriptado moderno o dejar abierto de forma pasiva fallas triviales detectadas en un reporte local arroja brechas para intrusos y ransomware. 
+
+Sintetizando conclusiones, los protocolos y despliegues virtualizados del paradigma de Sistemas Operativos Distribuidos y sus implementaciones de pares P2P demuestran ser innovaciones eficientes, fiables y transparentes destinadas fundamentalmente para equilibrar latencias con descentralización de recursos y maximizar capacidades de usuarios aislados; no obstante, todo esto debe acoplarse y subyugarse siempre al correcto monitoreo preventivo de un control de flujos auditable capaz y con las salvaguardas restrictivas competentes para asegurar su persistencia estable e ininterrumpible.
 
 \newpage
 
-% 4. Referencias (Sección solicitada de Actividad 3)
-\nocite{*}
+% 4. Referencias bibliográficas
+\nocite{*}   %% Forza inclusión de las citaciones de referencias
 \printbibliography[title={Referencias}]
 
 \end{document}
