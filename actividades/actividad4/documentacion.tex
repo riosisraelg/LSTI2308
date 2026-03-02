@@ -6,6 +6,8 @@
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{babel}
 
 % Configuraciones de colores para resaltado de código sintáctico
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -60,9 +62,9 @@
 
 % Información del documento
 \title{Actividad 4: Redes de Datos, Seguridad y Sistemas Distribuidos}
-\author{Fernando Israel Rios Garcia (AL02877016@tecmilenio.mx), \\
-        Artur Mikhail Lazurenko Mannanov (AL03028732@tecmilenio.mx), \\
-        Angel Cuevas Lopez (AL03033114@tecmilenio.mx)}
+\author{Fernando Israel Rios Garcia-AL02877016@tecmilenio.mx \\
+        Artur Mikhail Lazurenko Mannanov-AL03028732@tecmilenio.mx\\
+        Angel Cuevas Lopez-AL03033114@tecmilenio.mx}
 \affiliation{Universidad Tecmilenio}
 \course{LSTI2308: Sistemas Operativos}
 \professor{Ana Cruz}
@@ -90,112 +92,110 @@ Posterior a la integración de la red, se aplicaron medidas de seguridad inform�
 
 \subsection{Parte 1. Diseño y configuración de una red de datos}
 
-\subsubsection{Diseño de la red}
-Para la fase de interconexión en esta práctica, se diseñó una red local privada compuesta por dos máquinas virtuales con un sistema operativo derivado de Linux (por ejemplo, Ubuntu Server/Desktop) ejecutándose virtualmente en la misma hiperación principal (VirtualBox o WSL). Dichas entidades se conectaron mediante su abstracción de red virtual interna configurada como "Only-Host" (Solo Anfitrión) para asegurar la comunicación aislada y bidireccional continua:
-\begin{itemize}
-    \item \textbf{Máquina 1 (Servidor Linux):} Posee la dirección IP estática \texttt{192.168.56.10} en su interfaz.
-    \item \textbf{Máquina 2 (Cliente Linux):} Posee la dirección IP estática \texttt{192.168.56.20} en su interfaz de red.
-\end{itemize}
+\subsubsection{Implementación: Diseño de Red de Datos Básica}
+\textbf{Objetivo:} Crear una red básica donde dos máquinas virtuales Linux puedan comunicarse entre sí utilizando VirtualBox.
 
-% Asegurarse de insertar la imagen de nuestro diagrama o esquema de red elaborado:
-\begin{figure}[h]
-    \centering
-    % \includegraphics[width=0.8\textwidth]{esquema_red.png}
-    \caption{Esquema básico de la red de datos con dos máquinas virtuales y sus IP estáticas.}
-    \label{fig:esquemared}
-\end{figure}
-
-El diseño de la comunicación para ambas máquinas en sus intercambios de datos se rige activamente de acuerdo a las capas teóricas del \textbf{Modelo OSI} \parencite{tanenbaum2011}. Esta correlación se puede mapear directamente hacia la red analizada de esta manera:
+\textbf{Pasos:}
 \begin{enumerate}
-    \item \textbf{Capa Física:} Está virtualizada por los adaptadores de red de la máquina hipervisora en VirtualBox, quienes transmiten la señal.
-    \item \textbf{Capa de Enlace de Datos:} Lidera el direccionamiento de hardware; VirtualBox procesa y asocia dinámicamente las direcciones MAC prefiguradas en el switch virtual hacia estas máquinas.
-    \item \textbf{Capa de Red:} Las direcciones IP estáticas locales configuradas (\texttt{192.168.56.x}) proporcionan una ruta lógica a los paquetes ICMP de prueba.
-    \item \textbf{Capa de Transporte:} Uso del protocolo TCP por el cual se conectan los puertos SSH o los paquetes de solicitud HTTP; garantizan una transferencia sin fallos de la petición.
-    \item \textbf{Capa de Sesión:} Administra las sesiones interactivas, como la sesión por terminal persistente obtenida tras el acceso final por SSH.
-    \item \textbf{Capa de Presentación:} Empaqueta los datos con codificación formal para ser transportados; destaca en el cifrado SSL que recubre a las transmisiones asimétricas.
-    \item \textbf{Capa de Aplicación:} Los clientes e interfaces ejecutadas por el final de la cadena de usuarios, como Firefox o la terminal local de SSH, en adición a demonios en lado del servidor (Apache/SSHD/NFS/P2P).
+    \item \textbf{Crear las máquinas virtuales}
+    \begin{itemize}
+        \item Instalar VirtualBox.
+        \item Crear dos máquinas virtuales llamadas: Linux VM A y Linux VM B.
+        \item Instalar una distribución Linux en cada una (por ejemplo Ubuntu Server o Debian).
+    \end{itemize}
+    \item \textbf{Configurar la red}
+    \begin{itemize}
+        \item Ir a Configuración $\rightarrow$ Red.
+        \item Seleccionar ``Adaptador 1''.
+        \item Elegir el modo: $\rightarrow$ ``Red interna'' o $\rightarrow$ ``Adaptador solo-anfitrión (Host-Only)''.
+        \item Asegurarse de que ambas máquinas estén en la misma red virtual.
+    \end{itemize}
+    \item \textbf{Asignar direcciones IP manualmente}
+    \begin{itemize}
+        \item En VM A: 
+        \begin{lstlisting}[language=bash]
+sudo ip addr add 192.168.100.10/24 dev enp0s3
+sudo ip link set enp0s3 up
+        \end{lstlisting}
+        \item En VM B: 
+        \begin{lstlisting}[language=bash]
+sudo ip addr add 192.168.100.20/24 dev enp0s3
+sudo ip link set enp0s3 up
+        \end{lstlisting}
+    \end{itemize}
+    \item \textbf{Probar conectividad}
+    \begin{itemize}
+        \item Desde VM A: 
+        \begin{lstlisting}[language=bash]
+ping 192.168.100.20
+        \end{lstlisting}
+        \item Si responde, la red está funcionando correctamente.
+        \item También se puede probar: \texttt{ssh}, servidor web, transferencia de archivos.
+    \end{itemize}
 \end{enumerate}
 
-\subsubsection{Configuración de direcciones IP}
-A fin de asegurar direcciones IP que no cambien al resetear, se modificó el método tradicional de DHCP por parámetros de capa de IP fijos, comúnmente en herramientas modernas de Linux que apuntan a \texttt{Netplan} (\texttt{/etc/netplan/00-installer-config.yaml}) u otros archivos gestores equivalentes:
-
-\begin{lstlisting}[language=bash, caption={Fichero base configuración de IP estática vía terminal (Netplan)}]
-network:
-  ethernets:
-    enp0s8:
-      addresses: [192.168.56.10/24] # Y .20 para la Máquina Cliente en su respectivo config
-  version: 2
-\end{lstlisting}
-
-Tras guardar los cambios del registro correspondiente junto al comando \texttt{sudo netplan apply}, se comprobó la eficacia de conectividad lógica a nivel red entre ambas computadoras introduciendo instrucciones \texttt{ping}. Efectivamente indicando recepción sin latencia perceptible y cero fallas al procesador.
-
-\begin{lstlisting}[language=bash, caption=Comandos y comprobación simple usando ping]
-# Ejecutado localmente en Máquina Cliente intentando buscar a Máquina Servidor
-ping -c 4 192.168.56.10
-\end{lstlisting}
-
-% Asegurarse de insertar captura de pantalla de ping/traceroute
 \begin{figure}[h]
     \centering
-    % \includegraphics[width=0.8\textwidth]{ping_resultado.png}
-    \caption{Resultados comprobados exitosos de comando ping y visualización de rutas.}
-    \label{fig:ping}
+    \includegraphics[width=0.8\textwidth]{ip_config.png}
+    \caption{Configuración de interfaz de red y asignación de direcciones IP en la máquina virtual.}
+    \label{fig:prac1_ip_config}
 \end{figure}
 
-\subsubsection{Implementación de servicios de red}
-El primer equipo virtual asume el rol de distribuidor del servidor web, mientras que el segundo equipo fustigará peticiones cliente tras las integraciones básicas indicadas: 
-\begin{lstlisting}[language=bash, caption=Instrucciones emitidas para instalar paquetes en la unidad Servidor]
-sudo apt update
-sudo apt install openssh-server apache2 -y
-sudo systemctl enable ssh apache2
-sudo systemctl start ssh apache2
-\end{lstlisting}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{ping_vm1.png}
+    \caption{Comprobación de conectividad mediante ping (Capa 3 de red).}
+    \label{fig:prac1_ping_vm1}
+\end{figure}
 
-Ya activos esos protocolos, la Máquina Cliente puede invocar pruebas interactivas de consumo de recursos demostrativas:
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{ping_success.png}
+    \caption{Respuesta exitosa de ping, conectando exitosamente las VM en Bridge UTM.}
+    \label{fig:prac1_ping_success}
+\end{figure}
+
+\subsubsection{Esquema de la red}
+\begin{verbatim}
+                Red virtual (Host-Only / Interna)
+                 192.168.100.0/24
+        ----------------------------------------
+
+           IP: 192.168.100.10              IP: 192.168.100.20
+        +--------------------+         +--------------------+
+        |   Linux VM A       |         |    Linux VM B      |
+        |--------------------|         |--------------------|
+        | App cliente        | <-----> | App servidor       |
+        | TCP/UDP            |         | TCP/UDP            |
+        | IP                 |         | IP                 |
+        | Driver red virtual |         | Driver red virtual |
+        +---------|----------+         +----------|---------+
+                  |                               |
+                  +------ Adaptador virtual ------+
+\end{verbatim}
+
+\subsubsection{Modelo OSI Aplicado al Diseño}
 \begin{itemize}
-    \item \textbf{SSH:} Introducción de \texttt{ssh usuario@192.168.56.10} logrando interpelar el prompt remoto.
-    \item \textbf{HTTP:} Petición \texttt{curl 192.168.56.10} en terminal (o navegación típica desde explorador gráfico si es entorno Desktop), logrando apreciar el HTML renderizado "Apache2 Default Page" arrojado nativamente.
+    \item \textbf{CAPA 7 -- APLICACIÓN:} Es donde se ejecutan los programas que utilizan la red. Ejemplo: SSH, ping, servidor web. Genera los datos que serán enviados.
+    \item \textbf{CAPA 6 -- PRESENTACIÓN:} Se encarga del formato, codificación y cifrado. Ejemplo: SSH cifra la información antes de enviarla.
+    \item \textbf{CAPA 5 -- SESIÓN:} Administra el inicio, mantenimiento y cierre de la comunicación. Ejemplo: Mantiene activa la sesión SSH hasta que el usuario la cierre.
+    \item \textbf{CAPA 4 -- TRANSPORTE:} Utiliza TCP o UDP. Divide los datos en segmentos. Controla errores, flujo y orden. Ejemplo: SSH usa TCP (puerto 22).
+    \item \textbf{CAPA 3 -- RED:} Usa direcciones IP. Se encarga del direccionamiento lógico. Ejemplo: VM A $\rightarrow$ 192.168.100.10, VM B $\rightarrow$ 192.168.100.20.
+    \item \textbf{CAPA 2 -- ENLACE DE DATOS:} Utiliza direcciones MAC. Encapsula en tramas. Detecta errores locales. Usa ARP para relacionar IP con MAC.
+    \item \textbf{CAPA 1 -- FÍSICA:} Transmite los bits. En este caso es un medio virtual. VirtualBox simula el cable de red.
 \end{itemize}
 
-% Asegurarse de insertar captura de acceder SSH y HTTP
-\begin{figure}[h]
-    \centering
-    % \includegraphics[width=0.8\textwidth]{ssh_http_prueba.png}
-    \caption{Accediendo mediante SSH satisfactoriamente al servidor desde el cliente y abriendo su página index inicial HTTP respectiva.}
-    \label{fig:ssh_http}
-\end{figure}
-
-\subsubsection{Implementación de servicios HTTP y HTTPS básicos (Scripts en Python)}
-Para cumplir con el requerimiento de levantar servicios web y comprender a fondo la capa de aplicación sin depender de un servidor externo y robusto como \textit{Apache}, se programaron dos scripts en Python (\texttt{http\_server.py} y \texttt{https\_server.py}). El lenguaje Python provee un módulo nativo que nos permite levantar un servidor en cuestión de líneas de código.
-
-\begin{lstlisting}[language=python, caption=Implementación de un servidor HTTP básico en Python (\texttt{http\_server.py})]
-#!/usr/bin/env python3
-import http.server
-import socketserver
-import os
-
-PORT = 80
-DIRECTORY = os.path.dirname(os.path.abspath(__file__))
-
-class Handler(http.server.SimpleHTTPRequestHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory=DIRECTORY, **kwargs)
-
-with socketserver.TCPServer(("0.0.0.0", PORT), Handler) as httpd:
-    print(f"Servidor HTTP activo en el puerto {PORT}. Sirviendo archivos de: {DIRECTORY}")
-    try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        print("\nServidor HTTP detenido.")
-\end{lstlisting}
-
-% Asegurarse de insertar captura de la ejecución del script http_server.py
-\begin{figure}[h]
-    \centering
-    % \includegraphics[width=0.8\textwidth]{ejecucion_http_python.png}
-    \caption{Ejecución del servicio HTTP mediante script nativo de Python en el equipo Servidor.}
-    \label{fig:python_http}
-\end{figure}
+\subsubsection{Flujo de Comunicación}
+\begin{enumerate}
+    \item La aplicación genera datos.
+    \item Se formatean y cifran.
+    \item Se establece la sesión.
+    \item TCP segmenta la información.
+    \item IP agrega direcciones.
+    \item Se encapsula en trama Ethernet.
+    \item Se transmite por el medio virtual.
+    \item La máquina destino recibe y desencapsula capa por capa.
+\end{enumerate}
 
 \subsection{Parte 2. Aplicación de medidas de seguridad}
 
@@ -215,7 +215,7 @@ sudo ufw enable             # Reinicio e iniciación de servicios
 % Insertar captura de pantalla sudo ufw status
 \begin{figure}[h]
     \centering
-    % \includegraphics[width=0.8\textwidth]{firewall_ufw.png}
+    \includegraphics[width=0.8\textwidth]{firewall_ufw.png}
     \caption{Listado de estado activo y reglas restrictivas vigentes en UFW.}
     \label{fig:firewall_ufw}
 \end{figure}
@@ -224,7 +224,7 @@ sudo ufw enable             # Reinicio e iniciación de servicios
 Habiendo abierto el puerto 22, persistía el riesgo humano de fuerza bruta SSH. Por ende, la política implementada erradicó la validez de contraseñas crudas o convencionales, cediendo su lugar de manera definitiva hacia firmas criptográficas por llaves (Asimetría en la criptografía):
 \begin{enumerate}
     \item Desde la terminal de la Máquina Cliente de origen se corrió el comando: \texttt{ssh-keygen -t rsa -b 4096}, generando así un par combinatorio secreto para el anfitrión.
-    \item Posteriormente, el contenido exacto de ese candado público \texttt{(.pub)} se instaló a distancia gracias a \texttt{ssh-copy-id usuario@192.168.56.10}.
+    \item Posteriormente, el contenido exacto de ese candado público \texttt{(.pub)} se instaló a distancia gracias a \texttt{ssh-copy-id usuario@192.168.1.73}.
     \item Evaluada la conexión inicial que ignoraba credenciales textuales, se bloqueó tajantemente a todo tercero mediante la edición nativa del archivo maestro \texttt{/etc/ssh/sshd\_config} al imponer forzosamente el parámetro final en \texttt{PasswordAuthentication no}.
     \item Finalmente se acató una recarga con \texttt{sudo systemctl restart ssh}.
 \end{enumerate}
@@ -239,10 +239,10 @@ openssl req -new -x509 -keyout server.pem -out server.pem -days 365 -nodes -subj
 # Iniciar servidor seguro HTTPS en Python
 sudo python3 https_server.py
 \end{lstlisting}
-El procedimiento culminó al visitar con un cliente la URL encriptada \texttt{https://192.168.56.10} y al probar una conexión directa con \texttt{curl -k}, evidenciando un canal de comunicación web encapsulado a nivel TLS robusto pero advertido en el navegador de no poseer validación raíz comercial.
+El procedimiento culminó al visitar con un cliente la URL encriptada \texttt{https://192.168.1.73} y al probar una conexión directa con \texttt{curl -k}, evidenciando un canal de comunicación web encapsulado a nivel TLS robusto pero advertido en el navegador de no poseer validación raíz comercial.
 
 \subsubsection{Análisis de vulnerabilidades y privacidad}
-Validar las topologías requiere auditorio informático y monitoreo pasivo. Consiguientemente, escaneamos remotamente de Máquina a Máquina todos los puertos abiertos en estado general. Utilizamos el ejecutable \texttt{Nmap} para una traza: \texttt{nmap -sV -A 192.168.56.10}. Tras analizar reportes de Nmap (y con Lynis de revisión nativa), surgen 3 riesgos/vulnerabilidades de particular atención a la privacidad corporativa:
+Validar las topologías requiere auditorio informático y monitoreo pasivo. Consiguientemente, escaneamos remotamente de Máquina a Máquina todos los puertos abiertos en estado general. Utilizamos el ejecutable \texttt{Nmap} para una traza: \texttt{nmap -sV -A 192.168.1.73}. Tras analizar reportes de Nmap (y con Lynis de revisión nativa), surgen 3 riesgos/vulnerabilidades de particular atención a la privacidad corporativa:
 
 \begin{itemize}
     \item \textbf{1. Vulnerabilidad (Exposición no regulada y huella en capas web):} Usualmente Apache puede desplegar un encabezado conteniendo las versiones internas de compilación u OS a la vista de extraños, induciendo explotación 0-day si un bug se revela en dicha versión. \\ \textbf{Solución:} Implementar ofuscación desactivando y escondiendo las firmas del Server Header en \texttt{apache2.conf} (\texttt{ServerSignature Off} y \texttt{ServerTokens Prod}).
@@ -253,62 +253,612 @@ Validar las topologías requiere auditorio informático y monitoreo pasivo. Cons
 % Insertar captura de vulnerabilidades nmap
 \begin{figure}[h]
     \centering
-    % \includegraphics[width=0.8\textwidth]{nmap_scan_vulnerabilities.png}
+    \includegraphics[width=0.8\textwidth]{nmap_scan_vulnerabilities.png}
     \caption{Fragmento de demostración tras revisión de vulnerabilidades aplicadas a la IP local ejecutando comandos Nmap.}
     \label{fig:nmapscan}
 \end{figure}
 
-\subsection{Parte 3. Exploración de sistemas operativos distribuidos y P2P}
+\subsection{Parte 2. Aplicación de medidas de seguridad}
 
-\subsubsection{Configuración de un sistema de archivos distribuido}
-Un sistema distribuido exitoso se encarga de homologar entornos. Como preámbulo funcional local, aplicamos \textbf{NFS} (Network File System) de manera que Máquina Servidora brinde cuotas nativas crudas que emulen el disco C: de un Cliente con una carpeta de sincronía completa bidireccional (\texttt{/var/nfs\_share}).
+A continuación, se detalla la implementación de medidas de seguridad fundamentales sobre las dos máquinas virtuales operando con \textbf{Ubuntu 25} en una red configurada en modo \textbf{Bridge} (Adaptador Puente).
 
-\textbf{Ejecución nativa en el Host-Servidor compartiendo el material:}
-\begin{lstlisting}[language=bash, caption=Habilitar daemon base exportador de archivos NFS]
-sudo apt install nfs-kernel-server
-sudo mkdir -p /var/nfs_share
-sudo chown nobody:nogroup /var/nfs_share/    # Evitar denegación de lectura a ajenos
-sudo nano /etc/exports
-# Agregar línea exacta validando UFW previa: 
-# /var/nfs_share    192.168.56.20(rw,sync,no_subtree_check)
-sudo systemctl restart nfs-kernel-server
+\subsubsection{Configuración de Firewall (UFW)}
+Para prevenir accesos no autorizados, se configuró el cortafuegos \texttt{UFW} estableciendo una política restrictiva por defecto, abriendo exclusivamente los puertos requeridos para las prácticas de red (SSH y P2P/NFS).
+
+\textbf{Ejecución en la Máquina 1 (Servidor):}
+\begin{lstlisting}[language=bash]
+# 1. Actualizar repositorios e instalar UFW
+sudo apt update
+sudo apt install ufw -y
+
+# 2. Denegar conexiones entrantes por defecto, permitir salientes
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+# 3. Permitir servicios esenciales para la práctica
+sudo ufw allow 22/tcp       # Permitir SSH
+sudo ufw allow 80/tcp       # Permitir HTTP (Opcional)
+sudo ufw allow 443/tcp      # Permitir HTTPS (Opcional)
+
+# Puertos para P2P (Transmission) y NFS de la Parte 3
+sudo ufw allow 51413/tcp    # Puerto BitTorrent P2P
+sudo ufw allow 51413/udp    # Puerto BitTorrent P2P UDP
+sudo ufw allow 2049         # Puerto para NFS
+
+# 4. Habilitar el Firewall
+sudo ufw enable
+
+# 5. Comprobar el estado y las reglas aplicadas
+sudo ufw status verbose
 \end{lstlisting}
 
-\textbf{Sincronización natural interna aplicada en terminal Cliente:}
-\begin{lstlisting}[language=bash, caption=Montaje directo de recursos foráneos mediante utilidades de red base (NFS Client)]
-sudo apt install nfs-common
-sudo mkdir -p /mnt/nfs_clientshare
-sudo mount 192.168.56.10:/var/nfs_share /mnt/nfs_clientshare
-\end{lstlisting}
-
-Luego de concluir con efectividad el ensamble remoto, es posible probar cómo un documento creado desde Máquina 2 (usando el comando local \texttt{touch /mnt/nfs\_clientshare/textonfs.txt}) se halla ya presente de facto explorando \texttt{/var/nfs\_share/} en el equipo inicial de la habitación host. Esta experimentación confirma sólidamente la característica de \textbf{transparencia de ubicación y acceso}; sin lugar a dudas el cliente gestiona archivos como locales (ext4) y está inconsciente de los procesos de empaquetamiento y encapsulación cruzada que enmascaran el hecho irrefutable de que estos yacen alejados físicamente subastados mediantes tramas en red a un disco duro remoto en otro servidor ajeno de fondo.
-
-% Inserción obligatoria pruebas NFS
 \begin{figure}[h]
     \centering
-    % \includegraphics[width=0.8\textwidth]{nfs_mount.png}
-    \caption{Montaje de carpeta y test de interacción al sistema de red transparente de archivos.}
-    \label{fig:nfs}
+    \includegraphics[width=0.8\textwidth]{ufw_status.png}
+    \caption{Comprobación de reglas activas y puertos de tráfico permitidos en el firewall UFW.}
+    \label{fig:prac2_ufw_status}
 \end{figure}
 
+\subsubsection{Hardening de SSH (Autenticación Criptográfica)}
+Se eliminó la vulnerabilidad inherente al uso de contraseñas de texto plano, transicionando forzosamente a un modelo de autenticación asimétrica utilizando llaves criptográficas RSA.
 
-\subsubsection{Exploración del modelo Peer-to-peer}
-De vuelta a las implementaciones centralizadas (SSH y NFS donde Servidor guarda todo), surge otro arquetipo colosal \textbf{Peer-to-Peer} (P2P). Su naturaleza elimina intermediarios estelares promoviendo clientes que simultáneamente sean servidores autosuficientes entre sí repartiendo fragmentos del bloque principal porciones pequeñas (peers). Usamos e instalamos en la dupla la tecnología \textit{Transmission-cli} o \textit{qBittorrent}.
+\textbf{Ejecución en la Máquina 2 (Cliente):}
+\begin{lstlisting}[language=bash]
+# 1. Generar un par de claves criptográficas locales (RSA)
+ssh-keygen -t rsa -b 4096
 
-Se forjó nativamente un archivo pesado local en Máquina 1 llamado hipotéticamente \textit{datos\_distribuidos.iso} a partir de allí se compila el "archivo enlace" conocido como .torrent. Al transferir este hash encriptado de enlace torrent a la Máquina 2 consumidora (empleando el cliente de su respectivo software equivalente), esta contacta de inmediato al servidor para solicitar subida fragmentada al instante. En un esquema natural con centenares de clientes interconectados mediante enjambres "torrents", cada peer enjambre provee su ínfima porción descargada ayudando a todos. La red P2P exalta descentralización, donde cada máquina virtual o equipo local provee de redundancia inamovible para salvar la integridad subida al colectivo, previniendo fallos críticos de que la infraestructura primaria en Máquina 1 reciba daño y colapsen las bajadas de los miles de peers restantes.
+# 2. Copiar la llave pública generada al servidor
+# Reemplazar <IP_DEL_SERVIDOR> por la IP de la Máquina 1
+ssh-copy-id estudiante@<IP_DEL_SERVIDOR>
 
+# 3. Probar el inicio de sesión criptográfico
+ssh estudiante@<IP_DEL_SERVIDOR>
+\end{lstlisting}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{ssh_copy_id.png}
+    \caption{Copia exitosa de la llave pública asimétrica RSA hacia el servidor.}
+    \label{fig:prac2_ssh_copy_id}
+\end{figure}
+
+\textbf{Ejecución en la Máquina 1 (Servidor) - Tras validar el acceso con llave:}
+\begin{lstlisting}[language=bash]
+# 1. Editar el archivo de configuración maestro del servicio SSH
+sudo nano /etc/ssh/sshd_config
+
+# 2. Modificar las siguientes directivas para deshabilitar logins inseguros:
+PermitRootLogin no
+PasswordAuthentication no
+
+# 3. Reiniciar el servicio SSH para aplicar políticas
+sudo systemctl restart ssh
+\end{lstlisting}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{ssh_config.png}
+    \caption{Modificación del archivo maestro \texttt{sshd\_config} para prohibir las contraseñas planas.}
+    \label{fig:prac2_ssh_config}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{ssh_login.png}
+    \caption{Login remoto de inmediato y sin contraseñas validando el acceso a través de la llave SSH.}
+    \label{fig:prac2_ssh_login}
+\end{figure}
+
+\subsubsection{Prevención de Intrusiones (Fail2ban)}
+Como medida paliativa activa contra ataques de denegación de servicio (DoS) o fuerza bruta volumétrica dirigida al puerto SSH recién endurecido, se implementó la herramienta \texttt{fail2ban}.
+
+\textbf{Ejecución en la Máquina 1 (Servidor):}
+\begin{lstlisting}[language=bash]
+# 1. Instalar la herramienta
+sudo apt install fail2ban -y
+
+# 2. El servicio se inicia automáticamente. Comprobar que corre:
+sudo systemctl status fail2ban
+
+# 3. Revisar si hay intentos de bloqueo en SSH
+sudo fail2ban-client status sshd
+\end{lstlisting}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{fail2ban.png}
+    \caption{Servicio Fail2ban activo, monitorizando activamente la seguridad del puerto local SSH.}
+    \label{fig:prac2_fail2ban}
+\end{figure}
+
+\subsubsection{Cifrado HTTPS (Certificados Autofirmados)}
+En caso de requerir asegurar un servicio web local, se demostró la generación de un certificado de infraestructura pública encriptada utilizando las librerías nativas de \texttt{OpenSSL} de Ubuntu 25.
+
+\textbf{Ejecución en la Máquina 1 (Servidor):}
+\begin{lstlisting}[language=bash]
+# 1. Instalar OpenSSL
+sudo apt install openssl -y
+
+# 2. Generar el certificado autofirmado para pruebas locales (Válido 365 días)
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/apache-selfsigned.key -out /etc/ssl/certs/apache-selfsigned.crt
+\end{lstlisting}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{openssl_cert.png}
+    \caption{Generación de claves y certificados X.509 autofirmados vía línea de comandos con OpenSSL.}
+    \label{fig:prac2_openssl_cert}
+\end{figure}
+
+\subsubsection{Configuración Inicial}
+\textbf{Requisitos:}
+\begin{itemize}
+    \item 2 máquinas virtuales con Ubuntu (20.04/22.04/24.04)
+    \item Misma red (adaptador puente o red NAT interna)
+    \item Mismo usuario en ambas máquinas (ej: estudiante)
+    \item Conectividad entre máquinas verificada con ping
+\end{itemize}
+
+Verificar conectividad:
+\begin{lstlisting}[language=bash]
+# Desde cualquier máquina, verificar su IP
+ip addr show | grep inet
+
+# Hacer ping a la otra máquina (usar su IP)
+ping <IP_DE_LA_OTRA_MAQUINA>
+\end{lstlisting}
+
+\subsubsection{Sistema de Archivos Distribuido (NFS)}
+\textbf{Objetivo:} Compartir una carpeta entre dos máquinas usando NFS para que ambas puedan leer y escribir archivos de forma transparente.
+
+\textbf{1.1 Configuración del Servidor NFS (Máquina 1)}
+\begin{lstlisting}[language=bash]
+# 1. Actualizar repositorios
+sudo apt update
+
+# 2. Instalar servidor NFS
+sudo apt install nfs-kernel-server -y
+
+# 3. Crear carpeta a compartir
+sudo mkdir -p /srv/nfs/compartido
+sudo chmod 777 /srv/nfs/compartido
+sudo chown nobody:nogroup /srv/nfs/compartido
+
+# 4. Configurar exports (permitir acceso desde cualquier IP para pruebas)
+# sudo nano /etc/exports
+# Añadir la siguiente línea al final del archivo:
+# /srv/nfs/compartido *(rw,sync,no_subtree_check,no_root_squash,insecure)
+
+# 5. Aplicar configuración
+sudo exportfs -ra
+sudo systemctl restart nfs-kernel-server
+
+# 6. Verificar que está compartiendo
+sudo exportfs -v
+sudo showmount -e localhost
+\end{lstlisting}
+
+\textbf{1.2 Configuración del Cliente NFS (Máquina 2)}
+\begin{lstlisting}[language=bash]
+# 1. Actualizar repositorios
+sudo apt update
+
+# 2. Instalar cliente NFS
+sudo apt install nfs-common -y
+
+# 3. Crear punto de montaje
+sudo mkdir -p /mnt/servidor_nfs
+
+# 4. Verificar que el servidor exporta la carpeta
+showmount -e <IP_DEL_SERVIDOR>
+
+# 5. Montar la carpeta compartida
+sudo mount -t nfs <IP_DEL_SERVIDOR>:/srv/nfs/compartido /mnt/servidor_nfs
+
+# 6. Verificar montaje
+df -h | grep nfs
+mount | grep nfs
+\end{lstlisting}
+
+\textbf{1.3 Pruebas de funcionamiento}
+
+En el CLIENTE:
+\begin{lstlisting}[language=bash]
+# Crear archivo desde el cliente
+echo "Hola desde la máquina cliente" | sudo tee /mnt/servidor_nfs/cliente.txt
+
+# Listar contenido
+ls -la /mnt/servidor_nfs/
+\end{lstlisting}
+
+En el SERVIDOR:
+\begin{lstlisting}[language=bash]
+# Verificar que el archivo llegó
+ls -la /srv/nfs/compartido/
+cat /srv/nfs/compartido/cliente.txt
+
+# Modificar desde el servidor
+echo "Modificado desde el servidor" | sudo tee -a /srv/nfs/compartido/cliente.txt
+\end{lstlisting}
+
+En el CLIENTE:
+\begin{lstlisting}[language=bash]
+# Verificar cambios
+cat /mnt/servidor_nfs/cliente.txt
+\end{lstlisting}
+
+Prueba bidireccional:
+\begin{lstlisting}[language=bash]
+# Desde cliente crear otro archivo
+touch /mnt/servidor_nfs/prueba_final.txt
+
+# Desde servidor verificarlo
+ls -la /srv/nfs/compartido/
+\end{lstlisting}
+
+\textbf{1.4 Hacer montaje permanente (opcional)}
+
+En el CLIENTE:
+\begin{lstlisting}[language=bash]
+# sudo nano /etc/fstab
+# Añadir la siguiente línea:
+# <IP_DEL_SERVIDOR>:/srv/nfs/compartido /mnt/servidor_nfs nfs defaults 0 0
+\end{lstlisting}
+
+\textbf{1.5 Solución de problemas comunes}
+\begin{lstlisting}[language=bash]
+# Verificar servicios
+sudo systemctl status nfs-kernel-server
+sudo systemctl status rpcbind
+
+# Ver logs
+sudo tail -f /var/log/syslog | grep nfs
+
+# Reiniciar servicios
+sudo systemctl restart rpcbind
+sudo systemctl restart nfs-kernel-server
+
+# Desactivar firewall para pruebas
+sudo ufw disable
+
+# Verificar conectividad de puertos
+nc -zv <IP_DEL_SERVIDOR> 2049
+\end{lstlisting}
+
+\textbf{1.6 Conceptos de transparencia observados}
+\begin{itemize}
+    \item Transparencia de acceso: El cliente accede a los archivos como si fueran locales.
+    \item Transparencia de ubicación: El usuario desconoce dónde están físicamente los datos.
+    \item Transparencia de escalamiento: Se pueden añadir más clientes fácilmente.
+\end{itemize}
+
+\subsubsection{Red Peer-to-Peer (BitTorrent)}
+\textbf{Objetivo:} Compartir un archivo entre dos máquinas usando el protocolo BitTorrent, demostrando las características del modelo P2P como descentralización, escalabilidad y resiliencia.
+
+\textbf{2.1 Instalación en AMBAS máquinas}
+\begin{lstlisting}[language=bash]
+# En ambas máquinas (servidor y cliente)
+sudo apt update
+sudo apt install transmission-cli transmission-daemon -y
+
+# Iniciar servicio
+sudo systemctl start transmission-daemon
+sudo systemctl enable transmission-daemon
+
+# Verificar estado
+sudo systemctl status transmission-daemon
+\end{lstlisting}
+
+\textbf{2.2 Configuración básica (opcional)}
+
+Si es necesario modificar la configuración:
+\begin{lstlisting}[language=bash]
+# Detener servicio antes de configurar
+sudo systemctl stop transmission-daemon
+
+# Editar configuración
+# sudo nano /var/lib/transmission-daemon/info/settings.json
+\end{lstlisting}
+
+Ajustes recomendados para laboratorio:
+\begin{lstlisting}[]
+{
+    "rpc-whitelist-enabled": false,
+    "rpc-authentication-required": false,
+    "peer-port": 51413,
+    "dht-enabled": true,
+    "pex-enabled": true,
+    "lpd-enabled": true
+}
+\end{lstlisting}
+\begin{lstlisting}[language=bash]
+# Iniciar servicio nuevamente
+sudo systemctl start transmission-daemon
+\end{lstlisting}
+
+\textbf{2.3 Crear archivo a compartir (en la máquina seeder)}
+\begin{lstlisting}[language=bash]
+# Crear carpeta para el archivo
+mkdir -p ~/p2p-compartido
+cd ~/p2p-compartido
+
+# Crear archivos de prueba
+echo "Este es un archivo de prueba para el laboratorio P2P" > documento.txt
+echo "Contenido adicional" >> documento.txt
+
+# Opcional: crear un archivo binario de mayor tamaño
+dd if=/dev/urandom of=archivo.bin bs=1M count=5
+
+# Verificar archivos creados
+ls -la
+\end{lstlisting}
+
+\textbf{2.4 Crear archivo .torrent (en la máquina seeder)}
+\begin{lstlisting}[language=bash]
+cd ~/p2p-compartido
+
+# Crear torrent con trackers públicos
+transmission-create -o ~/compartido.torrent \
+  -t udp://tracker.openbittorrent.com:80 \
+  -t udp://tracker.opentrackr.org:1337/announce \
+  -t udp://tracker.coppersurfer.tk:6969/announce \
+  .
+
+# Verificar creación
+ls -la ~/compartido.torrent
+\end{lstlisting}
+
+Explicación de parámetros:
+\begin{itemize}
+    \item \texttt{-o}: Archivo de salida (el .torrent)
+    \item \texttt{-t}: URL del tracker (varios para mayor probabilidad de conexión)
+    \item \texttt{.}: Directorio actual a compartir (puede ser un archivo específico)
+\end{itemize}
+
+\textbf{2.5 Compartir el archivo (seeding) en la máquina seeder}
+\begin{lstlisting}[language=bash]
+# Añadir el torrent a Transmission
+transmission-remote -a ~/compartido.torrent -w ~/p2p-compartido
+
+# Verificar que está seedeando
+transmission-remote -l
+\end{lstlisting}
+La salida debe mostrar:
+\begin{itemize}
+    \item Done: 100\%
+    \item State: Seeding o Idle (si no hay peers conectados)
+\end{itemize}
+
+\textbf{2.6 Transferir el archivo .torrent a la otra máquina}
+
+Opción A: Usando scp (recomendado)
+\begin{lstlisting}[language=bash]
+# En la máquina seeder, enviar el archivo a la otra máquina
+scp ~/compartido.torrent usuario@<IP_OTRA_MAQUINA>:~/
+\end{lstlisting}
+
+Opción B: Usando la carpeta NFS (si ya está configurada)
+\begin{lstlisting}[language=bash]
+# Copiar a la carpeta compartida por NFS
+cp ~/compartido.torrent /srv/nfs/compartido/
+
+# En la otra máquina, copiar desde allí
+cp /mnt/servidor_nfs/compartido.torrent ~/
+\end{lstlisting}
+
+\textbf{2.7 Descargar el archivo (en la máquina cliente)}
+\begin{lstlisting}[language=bash]
+# Verificar que el archivo .torrent llegó
+ls -la ~/compartido.torrent
+
+# Añadir el torrent a Transmission
+transmission-remote -a ~/compartido.torrent -w ~/Descargas
+
+# Iniciar la descarga (si no comienza automáticamente)
+transmission-remote -t all -s
+
+# Verificar estado de la descarga
+transmission-remote -l
+\end{lstlisting}
+
+\textbf{2.8 Monitorear la transferencia}
+
+En la máquina seeder:
+\begin{lstlisting}[language=bash]
+# Ver estado en tiempo real
+watch -n 2 transmission-remote -l
+\end{lstlisting}
+
+En la máquina cliente:
+\begin{lstlisting}[language=bash]
+# Ver progreso de descarga
+watch -n 2 transmission-remote -l
+
+# Ver detalles del torrent
+transmission-remote -t 1 -i
+\end{lstlisting}
+
+\textbf{2.9 Verificar la descarga (en la máquina cliente)}
+\begin{lstlisting}[language=bash]
+# Una vez completada la descarga (100%)
+ls -la ~/Descargas/
+cat ~/Descargas/documento.txt
+
+# Comparar con el archivo original (opcional)
+md5sum ~/Descargas/archivo.bin
+# En la máquina seeder:
+md5sum ~/p2p-compartido/archivo.bin
+# Deben ser iguales
+\end{lstlisting}
+
+\textbf{2.10 Solución de problemas en P2P}
+\begin{lstlisting}[language=bash]
+# Verificar que el servicio está corriendo
+sudo systemctl status transmission-daemon
+
+# Ver logs
+sudo journalctl -u transmission-daemon -f
+
+# Verificar puertos
+sudo ss -tulpn | grep 51413
+
+# Abrir puertos en firewall
+sudo ufw allow 51413/tcp
+sudo ufw allow 51413/udp
+
+# Verificar conectividad entre máquinas
+nc -zv <IP_OTRA_MAQUINA> 51413
+
+# Forzar reanuncio del tracker
+transmission-remote -t all -r
+
+# Añadir peers manualmente (si es necesario)
+transmission-remote -t all -padd <IP_OTRA_MAQUINA>:51413
+
+# Ver lista de peers
+transmission-remote -t all -pi
+\end{lstlisting}
+
+\textbf{2.11 Características del modelo P2P observadas}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|p{4cm}|p{10cm}|}
+\hline
+\textbf{Característica} & \textbf{Observación en el laboratorio} \\ \hline
+Descentralización & No hay un servidor central, ambas máquinas se conectan directamente \\ \hline
+Escalabilidad & Si más máquinas se unen, la velocidad de descarga puede mejorar \\ \hline
+Resiliencia & Si el seeder se desconecta, otros peers pueden seguir compartiendo \\ \hline
+Tragedia del común & Si todos descargan y nadie comparte, la red falla \\ \hline
+Intercambio de piezas & Los archivos se dividen en piezas que se intercambian \\ \hline
+\end{tabular}
+\end{table}
+
+\textbf{2.12 Comandos útiles de transmission-remote}
+\begin{lstlisting}[language=bash]
+# Listar todos los torrents
+transmission-remote -l
+
+# Ver información detallada de un torrent
+transmission-remote -t <ID> -i
+
+# Iniciar un torrent
+transmission-remote -t <ID> -s
+
+# Pausar un torrent
+transmission-remote -t <ID> -S
+
+# Eliminar un torrent (sin borrar datos)
+transmission-remote -t <ID> -r
+
+# Eliminar un torrent y borrar datos
+transmission-remote -t <ID> -rad
+
+# Añadir tracker
+transmission-remote -t <ID> -td "udp://nuevo.tracker.com:80"
+
+# Ver peers
+transmission-remote -t <ID> -pi
+
+# Ver información de sesión
+transmission-remote -si
+\end{lstlisting}
 
 \subsubsection{Reflexión sobre sistemas distribuidos}
-Nuestra labor ejecutando NFS y BitTorrent arroja indicios sustanciales que demuestran qué capacidad alberga toda red de volverse entidades integrales para fines colaborativos.
-Observamos como parte de sus \textbf{ventajas}: primero, un enorme abaratamiento y homogeneización; los empleados de un complejo pueden interactuar sobre reportes con material consolidado como local pese a provenir de almacenaje externo (NFS). Segundo, en sistemas distribuidos verdaderos (P2P) se incrementa de forma exponencial la redundancia y resiliencia corporativa anti-censura frente a una falla abrupta de hardware de un único servidor principal.
 
-Sin embargo, en el apartado de sus naturales \textbf{desventajas}: encontramos en repetidas ocasiones que el balance de seguridad escala con la complejidad. Un puerto expuesto al escaneo público indebidamente para compartición de fichas es devastador, pues el control descentralizado no siempre asegura que el receptor remoto cumpla los criterios de pureza y limpieza en el software original, o incluso a nivel hardware, produce una severa fatiga saturante sobre las interfaces de red locales por el exceso agresivo de descubrimiento por difusión de paquetes e intercambio por fragmentos P2P si uno carece del monitoreo de tráfico con Quality of Service (QoS) aptos.
+\textbf{3.1 Características observadas en NFS}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|p{4cm}|p{10cm}|}
+\hline
+\textbf{Característica} & \textbf{Descripción} \\ \hline
+Compartición de recursos & El servidor comparte su almacenamiento con el cliente \\ \hline
+Transparencia & El cliente accede a los archivos como si fueran locales \\ \hline
+Concurrencia & Múltiples clientes pueden acceder a los mismos archivos \\ \hline
+Punto único de fallo & Si el servidor falla, nadie accede a los datos \\ \hline
+\end{tabular}
+\end{table}
+
+\textbf{3.2 Características observadas en BitTorrent}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|p{4cm}|p{10cm}|}
+\hline
+\textbf{Característica} & \textbf{Descripción} \\ \hline
+Descentralización & No hay servidor central, todos son pares \\ \hline
+Escalabilidad & Más peers = más ancho de banda disponible \\ \hline
+Resiliencia & Si un peer falla, otros continúan \\ \hline
+Auto-organización & Los peers se descubren y organizan sin intervención \\ \hline
+\end{tabular}
+\end{table}
+
+\textbf{3.3 Ventajas y desventajas}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|p{3cm}|p{5cm}|p{6cm}|}
+\hline
+\textbf{Sistema} & \textbf{Ventajas} & \textbf{Desventajas} \\ \hline
+NFS & Simple, transparente, fácil gestión centralizada & Punto único de fallo, cuello de botella \\ \hline
+BitTorrent & Escalable, robusto, eficiente para archivos grandes & Complejidad, dependencia de trackers \\ \hline
+\end{tabular}
+\end{table}
+
+\textbf{Anexo: Comandos Rápidos}
+
+NFS - Resumen rápido
+\begin{lstlisting}[language=bash]
+# Servidor
+sudo apt install nfs-kernel-server
+sudo mkdir -p /srv/nfs/compartido
+sudo chmod 777 /srv/nfs/compartido
+echo "/srv/nfs/compartido *(rw,sync,no_subtree_check)" | sudo tee -a /etc/exports
+sudo exportfs -ra
+sudo systemctl restart nfs-kernel-server
+
+# Cliente
+sudo apt install nfs-common
+sudo mkdir -p /mnt/servidor_nfs
+sudo mount -t nfs <IP_SERVIDOR>:/srv/nfs/compartido /mnt/servidor_nfs
+\end{lstlisting}
+
+P2P - Resumen rápido
+\begin{lstlisting}[language=bash]
+# Ambas máquinas
+sudo apt install transmission-cli transmission-daemon
+sudo systemctl start transmission-daemon
+
+# Seeder
+mkdir -p ~/p2p
+cd ~/p2p
+echo "test" > archivo.txt
+transmission-create -o ~/compartido.torrent -t udp://tracker.openbittorrent.com:80 .
+transmission-remote -a ~/compartido.torrent -w ~/p2p
+
+# Cliente
+scp <usuario>@<IP_SERVIDOR>:~/compartido.torrent ~/
+transmission-remote -a ~/compartido.torrent -w ~/Descargas
+transmission-remote -t all -s
+\end{lstlisting}
 
 \section{Análisis y reflexión}
 
-El ensamble final integrando conceptos pragmáticos del curso logró trazar en el plano material los hilos comunicativos conceptuales correspondientes al modelo puramente teórico (OSI). Afrontamos con efectividad retos al diagnosticar tempranamente fallas en sintaxis manual de certificados de encriptación autofirmados al interactuar su instalación con los sub-demonios de Apache SSL y se reaccionó acorde a los errores imprevistos en los montajes de las particiones NFS en entornos virtualizados Linux.
+El ensamble final integrando conceptos pragmáticos del curso logró trazar en el plano material los hilos comunicativos conceptuales correspondientes al modelo puramente teórico (OSI), estableciendo una relación sólida entre la teoría académica y su aplicación funcional.
 
-El corolario del progreso evidenció cómo la seguridad computacional interconectada carece de soluciones monolíticas mágicas o absolutas; por ende, requiere esquematizarse con engranajes redundantes formados por candados asimétricos, filtros rudimentarios estrictamente acotados (UFW) y ocultamientos del vector físico expuesto hacia clientes o hacia enjambres distribuidos.
+\textbf{Tres aprendizajes obtenidos directos:}
+\begin{enumerate}
+    \item La seguridad perimetral carece de soluciones monolíticas absolutas; de esta actividad se desprende imperativamente que blindar una red requiere esquematizarse con engranajes redundantes continuos (ej. uso conjunto de firewalls restrictivos UFW más el resguardo de llaves asimétricas).
+    \item La ejecución de un micro-servidor HTTPS comprobó analíticamente cómo funcionan las negociaciones TLS desde adentro, atestiguando que la capa de red subyacente puede converger localmente sin precisar de hiper-estructuras robustas mundiales de un C.A. externo publicitado.
+    \item La transparencia fundamental de un sistema distribuido como NFS es vital para su proliferación corporativa escalable. Evidencia la practicidad de brindar cuotas nativas crudas con una carpeta de sincronía completa bidireccional sin lastimar los procesos paralelos de lectura/escritura (I/O).
+\end{enumerate}
+
+\textbf{Dos desafíos enfrentados y su solución técnica:}
+\begin{itemize}
+    \item \textbf{Desafío 1 - Aislamiento DNS y Virtualidad de Red:} Tras aislar localmente la IP al intentar confinar tráfico, el servidor perdió provisión externa en \texttt{127.0.0.53} y hubo fracaso descargando Nmap/NFS, bloqueado a su vez bajo un error silencioso asíncrono en \texttt{ports.ubuntu.com}. \\ \textbf{Solución:} Se debió destituir momentáneamente la imposición hostil del UFW mediante \texttt{sudo ufw disable} y se procedió con una técnica blanda de reinstalar DHCP dinámico en Netplan (\texttt{dhcp4: true}) para destrabar al hipervisor UTM resolviendo así la descarga paralela y reescribiendo la tabla ARP transitoria, restaurando conectividad global.
+    \item \textbf{Desafío 2 - Conflicto de firmas HTTPS nativas:} Inconvenientes lógicos y caídas abrutas al encapsular el servicio HTTP convencional en sub-demonios de encriptación autofirmados sin utilizar dependencias mediadoras como Apache HTTP Server. \\ \textbf{Solución:} Se requirió implementar nativamente el encapsulamiento paramétrico de Python a través de dependencias estrictas interactivas (\texttt{ssl.wrap\_socket}), integrando y reconduciendo la envoltura en memoria para que no abortara prematuramente ante rechazo por validación raíz comercial inexistente.
+\end{itemize}
 
 \section{Conclusiones}
 
